@@ -156,7 +156,7 @@ class ExampleApp(tk.Tk):
                 for x in range(len(self.array)):
                     for y in range(len(self.array[0])):
                         self.image_out.paste(self.images[self.array[x][y]], (x * 41, y * 41))
-                self.image_out.save(str(self.filename.get()) + ".png")
+                self.image_out.save("ResultsDirectory/" + str(self.filename.get()) + ".png")
                 self.smallmap = ImageTk.PhotoImage(
                     self.image_out.resize((350, min(900, round(350 * (len(self.array[0]) / len(self.array))))),
                                           Image.ANTIALIAS))
@@ -617,7 +617,7 @@ def generate_landscape(map, number_of_chunks_x, number_of_chunks_y, size_of_chun
 # Cохранение массива высот в txt файле filename
 def write_map_array(stock, filename):
     # Создаём отдельный файл filename.txt
-    file = open(filename + '.txt', 'w')
+    file = open('ResultsDirectory/' + filename + '.txt', 'w')
 
     # Пишем размер карты первыми 2 цифрами в файл
     file.write(str(len(stock)) + ' ' + str(len(stock[0])) + '\n')
