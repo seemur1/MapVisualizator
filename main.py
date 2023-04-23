@@ -41,8 +41,8 @@ class ExampleApp(tk.Tk):
         # master = looped root, к которому мы "привязались"
 
         # Указание наименований текстур, импортируемых в вывод *позиция имеет значение!!!*
-        self.names = ['ResoursesDirectory/Water_deep.png', 'ResoursesDirectory/Water_not_deep.png', 'ResoursesDirectory/Plains.png',
-                      'ResoursesDirectory/Forests.png', 'ResoursesDirectory/Mountains.png', 'ResoursesDirectory/Snowy_mountains.png']
+        self.names = ['ResourcesDirectory/Water_deep.png', 'ResourcesDirectory/Water_not_deep.png', 'ResourcesDirectory/Plains.png',
+                      'ResourcesDirectory/Forests.png', 'ResourcesDirectory/Mountains.png', 'ResourcesDirectory/Snowy_mountains.png']
         self.master = master
 
         self.counter_x = self.counter_y = 0
