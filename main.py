@@ -41,8 +41,10 @@ class ExampleApp(tk.Tk):
         # master = looped root, к которому мы "привязались"
 
         # Указание наименований текстур, импортируемых в вывод *позиция имеет значение!!!*
-        self.names = ['ResourcesDirectory/Water_deep.png', 'ResourcesDirectory/Water_not_deep.png', 'ResourcesDirectory/Plains.png',
-                      'ResourcesDirectory/Forests.png', 'ResourcesDirectory/Mountains.png', 'ResourcesDirectory/Snowy_mountains.png']
+        self.names = ['ResourcesDirectory/Water_deep.png', 'ResourcesDirectory/Water_not_deep.png',
+                      'ResourcesDirectory/Plains.png',
+                      'ResourcesDirectory/Forests.png', 'ResourcesDirectory/Mountains.png',
+                      'ResourcesDirectory/Snowy_mountains.png']
         self.master = master
 
         self.counter_x = self.counter_y = 0
@@ -73,8 +75,8 @@ class ExampleApp(tk.Tk):
 
         self.sizemap_x_label = tk.Label(self.framework1, text="Введите длину карты: ")
         self.sizemap_y_label = tk.Label(self.framework1, text="Введите ширину карты: ")
-        self.number_of_continents_label = tk.Label(self.framework1, text="Введите количество конинентов: ")
-        self.filename_label = tk.Label(self.framework1, text="Введите имя файла, для записи карты: ")
+        self.number_of_continents_label = tk.Label(self.framework1, text="Введите количество континентов: ")
+        self.filename_label = tk.Label(self.framework1, text="Введите имя файла для записи карты: ")
 
         self.sizemap_x_label.grid(row=0, column=0, sticky="w")
         self.sizemap_y_label.grid(row=1, column=0, sticky="w")
@@ -105,8 +107,8 @@ class ExampleApp(tk.Tk):
         self.message_button.grid(row=0, column=0, sticky="nesw")
         self.message_button.bind("<Button-1>", self._map_generate)
 
-        self.smallmap = Image.open("Example.png")
-        self.smallmap = self.smallmap.resize((350, 350), Image.ANTIALIAS)
+        self.smallmap = Image.open("ResultsDirectory/example.png")
+        self.smallmap = self.smallmap.resize((350, 350), Image.Resampling.LANCZOS)
         self.smallmap = ImageTk.PhotoImage(self.smallmap)
 
         self.minimap = tk.Label(self.framework2, image=self.smallmap)
@@ -159,7 +161,7 @@ class ExampleApp(tk.Tk):
                 self.image_out.save("ResultsDirectory/" + str(self.filename.get()) + ".png")
                 self.smallmap = ImageTk.PhotoImage(
                     self.image_out.resize((350, min(900, round(350 * (len(self.array[0]) / len(self.array))))),
-                                          Image.ANTIALIAS))
+                                          Image.Resampling.LANCZOS))
                 self.minimap.configure(image=self.smallmap)
                 self.minimap.image = self.smallmap
             else:
@@ -177,7 +179,7 @@ class ExampleApp(tk.Tk):
         self.items.clear()
         self.canvas.delete("all")
 
-        # Было подсчитано, что при расширении 1920х1080 на экран помещается прямогугольник размера 47х27 клеток
+        # Было подсчитано, что при расширении 1920х1080 на экран помещается прямоугольник размера 47х27 клеток
         SIZE_OF_SCREEN_X = 47
         SIZE_OF_SCREEN_Y = 27
         SIZE_OF_IMAGE = 41
@@ -192,7 +194,7 @@ class ExampleApp(tk.Tk):
 
 # -----------------------------------------------------------------------------Классы--------------------------------------------------------------------------
 
-class square:
+class Square:
     def __init__(self):
         # Скорость "роста высоты" клетки
         self.speed = int()
@@ -214,15 +216,15 @@ class square:
         self.typeres = int()
 
 
-class square_map:
+class SquareMap:
 
     # Инициалиация карты клеток
-    def __init__(self, length, heigth, sizemap_x, sizemap_y):
+    def __init__(self, length, height, sizemap_x, sizemap_y):
         self.stock = []
 
         # Указание размера первичной карты
         for i in range(length + 2):
-            useless = [square() for i in range(heigth + 2)]
+            useless = [Square() for i in range(height + 2)]
             self.stock.append(useless)
         self.under_development = Queue()
         self.turn_cleaning = []
@@ -317,7 +319,7 @@ class square_map:
 
         # Изменяем скорость роста высот в клетке-соседе по формуле ниже (игнорируя знак)
         to.speed = ((value * (
-                    to.speed + father.speed + custom_rand(t) + (ground_level - father.main))) % speed_cut) * value
+                to.speed + father.speed + custom_rand(t) + (ground_level - father.main))) % speed_cut) * value
 
     # Аппроксимация высот карты
     def approximation(self):
@@ -617,18 +619,18 @@ def generate_landscape(map, number_of_chunks_x, number_of_chunks_y, size_of_chun
 # Cохранение массива высот в txt файле filename
 def write_map_array(stock, filename):
     # Создаём отдельный файл filename.txt
-    file = open('ResultsDirectory/' + filename + '.txt', 'w')
+    with open('ResultsDirectory/' + filename + '.txt', 'w') as file:
 
-    # Пишем размер карты первыми 2 цифрами в файл
-    file.write(str(len(stock)) + ' ' + str(len(stock[0])) + '\n')
+        # Пишем размер карты первыми 2 цифрами в файл
+        file.write(str(len(stock)) + ' ' + str(len(stock[0])) + '\n')
 
-    output = ""
-    # Записываем каждую высоту в filename.txt
-    for x in range(len(stock)):
-        for y in range(len(stock[0])):
-            output += str(stock[x][y]) + " "
-        file.write(output + '\n')
         output = ""
+        # Записываем каждую высоту в filename.txt
+        for x in range(len(stock)):
+            for y in range(len(stock[0])):
+                output += str(stock[x][y]) + " "
+            file.write(output + '\n')
+            output = ""
 
 
 # Генерация карты
@@ -641,7 +643,7 @@ def map_generator(sizemap_x, sizemap_y, number_of_continents, filename, normal, 
     number_of_chunks_y = heigth // 25
 
     # Задаём необходимый размер карты
-    map = square_map(length, heigth, sizemap_x, sizemap_y)
+    map = SquareMap(length, heigth, sizemap_x, sizemap_y)
 
     size_of_chunks_x = length // (number_of_chunks_x + 1)
     size_of_chunks_y = heigth // (number_of_chunks_y + 1)
@@ -668,7 +670,7 @@ def map_generator(sizemap_x, sizemap_y, number_of_continents, filename, normal, 
     return map.interpolated_map
 
 
-# ----------------------------------------------------------------------------Тело программы----------------------------------------------------------------------
+# ---------------------------------------Тело программы---------------------------------------
 
 if __name__ == '__main__':
     # Работаем с окном вывода программы
@@ -677,8 +679,8 @@ if __name__ == '__main__':
     root.rowconfigure(0, weight=1)
     root.columnconfigure(1, weight=1)
     app = ExampleApp(root)
-    if sys.platform != 'linux':
-        root.wm_state('zoomed')
-    else:
-        root.wm_attributes('-zoomed', True)
+
+    w, h = root.winfo_screenwidth(), root.winfo_screenheight()
+    root.geometry("%dx%d+0+0" % (w, h))
+
     root.mainloop()
